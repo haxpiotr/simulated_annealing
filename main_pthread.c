@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
     struct timeval st, et;
 
-    int milliseconds_elapsed_openmp = 0;
+    int milliseconds_elapsed_pthreads = 0;
 
     double (*function)(double*,unsigned int);
 
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     }
 
     printf("Simulated Annealing using pthreads, size of %s function: %d run on %d threads out of %d available with %d test iterations\n"
-    ,argv[4],size_of_task,threads,threads,test_iterations);
+    ,argv[4],size_of_task,threads,omp_get_num_procs(),test_iterations);
 
     for(unsigned int i = 0; i < test_iterations; ++i)
     {
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 
         gettimeofday(&st,NULL);
 
-        double result_omp = simulated_annealing_pthread(&config,
+        double result_pthreads = simulated_annealing_pthread(&config,
                                             function,
                                             size_of_task,
                                             x_0,
@@ -145,8 +145,8 @@ int main(int argc, char *argv[])
 
         gettimeofday(&et,NULL);
 
-        int elapsed_in_openmp = ((et.tv_sec - st.tv_sec) * 1000) + (et.tv_usec - st.tv_usec) / 1000;
-        milliseconds_elapsed_openmp += elapsed_in_openmp;
+        int elapsed_in_pthreads = ((et.tv_sec - st.tv_sec) * 1000) + (et.tv_usec - st.tv_usec) / 1000;
+        milliseconds_elapsed_pthreads += elapsed_in_pthreads;
 
         printf("Optimal solution for %s function using pthread\n", argv[4]);
 
@@ -155,12 +155,12 @@ int main(int argc, char *argv[])
             printf("x[%d]: %.17g, ",i, x_opt[i]);
         }
 
-        printf("\nSimulated Annealing using pthread, result: %.17g in %d ms\n", result_omp, elapsed_in_openmp);
+        printf("\nSimulated Annealing using pthread, result: %.17g in %d ms\n", result_pthreads, elapsed_in_pthreads);
     }
 
-    int avg_time_openmp = milliseconds_elapsed_openmp / test_iterations;
+    int avg_time_pthreads = milliseconds_elapsed_pthreads / test_iterations;
 
-    printf("Simulated Annealing using pthread, average time of %d runs for %s function of size: %d: %d milliseconds\n",test_iterations,argv[4],size_of_task, avg_time_openmp);
+    printf("Simulated Annealing using pthread, average time of %d runs for %s function of size: %d: %d milliseconds\n",test_iterations,argv[4],size_of_task, avg_time_pthreads);
 
     int milliseconds_elapsed_seq = 0;
 
@@ -228,9 +228,9 @@ int main(int argc, char *argv[])
 
     int avg_time_seq = milliseconds_elapsed_seq / test_iterations;
 
-    double omp_speedup = (double)avg_time_seq/(double)avg_time_openmp;
+    double pthreads_speedup = (double)avg_time_seq/(double)avg_time_pthreads;
 
-    printf("Simulated Annealing speed up using OpenMP with %d threads out of %d available: %f\n",threads, omp_get_num_procs(),omp_speedup);
+    printf("Simulated Annealing speed up using pthreads with %d threads out of %d available: %f\n",threads, omp_get_num_procs(),pthreads_speedup);
 
     return 0;
 }
