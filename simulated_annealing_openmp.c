@@ -66,20 +66,37 @@ double simulated_annealing_openmp(struct configuration* config,
                 }
             }
         }
+
+        unsigned int best_index = 0;
+        double temp_best_result = function(best_solution[best_index], N);
         
-        for(unsigned int i = 1; i < procs ;++i)
+        for(unsigned int i = 1; i < procs; ++i)
         {
-            if(function(best_solution[i-1],N) < function(best_solution[i],N))
+            double temp_current_result = function(best_solution[best_index], N);
+            if(temp_current_result < temp_best_result)
             {
-                copy_to_array(best_solution[i],best_solution[i-1],N);
-                copy_to_array(current_solution[i],best_solution[i-1],N);
+                temp_best_result = temp_current_result;
+                best_index = i;
             }
+        }
+
+        for(unsigned int i = 0; i < procs; ++i)
+        {
+            if(i == best_index)
+            {
+                continue;
+            }
+            copy_to_array(best_solution[i],best_solution[best_index],N);
+            copy_to_array(current_solution[i],best_solution[best_index],N);
+            current_result[i] = temp_best_result;
         }
 
         T = T * (1 - alpha);
     }
 
     double best_result = function(best_solution[0], N);
+    copy_to_array(x_optimal,best_solution[0],N);
+    
     for(unsigned int i = 1; i < procs; ++i)
     {
         const double temp_best_result = function(best_solution[i], N);

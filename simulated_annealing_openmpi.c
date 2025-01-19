@@ -31,10 +31,10 @@ double simulated_annealing_openmpi(struct configuration* config,
     int world_size; // number of processes
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
-    printf("## Simulated Annealing OpenMPI from processor %s, rank %d out of %d processors ##\n",
-            processor_name, world_rank, world_size);
-
     double current_result = function(x_0,N);
+
+    printf("## Simulated Annealing OpenMPI from processor %s, rank %d out of %d processors, initial result: %.17g ##\n",
+            processor_name, world_rank, world_size, current_result);
 
     while(T > eps)
     {

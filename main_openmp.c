@@ -52,8 +52,8 @@ int main(int argc, char *argv[])
     {
         .initial_temperature = 1000,
         .alpha_coefficient = 0.01,
-        .minimal_temperature = 0.00001,
-        .iterations_per_temperature_step = 250
+        .minimal_temperature = 0.0000001,
+        .iterations_per_temperature_step = 1000000
     };
 
     struct timeval st, et;
@@ -99,6 +99,8 @@ int main(int argc, char *argv[])
     printf("Simulated Annealing using OpenMP, size of %s function: %d run on %d threads out of %d available with %d test iterations\n"
     ,argv[4],size_of_task,threads,omp_get_num_procs(),test_iterations);
 
+    
+
     for(unsigned int i = 0; i < test_iterations; ++i)
     {
         if(choice == engval)
@@ -107,6 +109,7 @@ int main(int argc, char *argv[])
             engval_function_initialize(x_opt,size_of_task);
             set_range_to(x_left_boundaries, size_of_task, (double)-10);
             set_range_to(x_right_boundaries, size_of_task, (double)10);
+            
         }else if(choice == rosenbrock)
         {
             generalized_rosenbrock_initialize(x_0,size_of_task);
@@ -132,7 +135,12 @@ int main(int argc, char *argv[])
             set_range_to(x_left_boundaries, size_of_task, (double)-1.2);
             set_range_to(x_right_boundaries, size_of_task, (double)1.2);
         }
-        
+
+        printf("function initial value: %.17g\n",function(x_0,size_of_task)); 
+
+        double x_0_d[] = {(double)1.0,(double)1.0,(double)1.0,(double)1.0};
+
+        printf("function initial x_0_d: %.17g\n",function(x_0_d,size_of_task)); 
 
         gettimeofday(&st,NULL);
 

@@ -68,7 +68,7 @@ void generalized_rosenbrock_initialize(double* x, unsigned int n)
 
     for(unsigned int i = 0; i < n; ++i)
     {
-        x[i] = -3 + val*val;
+        x[i] = 3 - val;
     }
 }
 

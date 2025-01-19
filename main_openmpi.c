@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 
     if(argc < 3)
     {
-        printf("Usage: mpirun -np <processors> ./sa_openmpi <size of function> <function(rastrigin|quartic)>\n");
+        printf("Usage: mpirun -np <processors> ./sa_openmpi <size of function> <function(rastrigin|quartic|rosenbrock)>\n");
         MPI_Finalize();
         return 0; 
     }
@@ -41,8 +41,8 @@ int main(int argc, char** argv)
     {
         .initial_temperature = 1000,
         .alpha_coefficient = 0.01,
-        .minimal_temperature = 0.00001,
-        .iterations_per_temperature_step = 250
+        .minimal_temperature = 0.000001,
+        .iterations_per_temperature_step = 1200000
     };
 
     double x_0[size_of_task];
@@ -66,9 +66,17 @@ int main(int argc, char** argv)
         set_range_to(x_left_boundaries, size_of_task, -1.1);
         set_range_to(x_right_boundaries, size_of_task, 1.1);
     }
+    else if(strcmp("rosenbrock",argv[2]) == 0)
+    {
+        function = generalized_rosenbrock_function;
+        generalized_rosenbrock_initialize(x_0,size_of_task);
+        generalized_rosenbrock_initialize(x_opt,size_of_task);
+        set_range_to(x_left_boundaries, size_of_task, (double)-3);
+        set_range_to(x_right_boundaries, size_of_task, (double)3);
+    }
     else
     {
-        printf("Usage: mpirun -np <processors> ./sa_openmpi <size of function> <function(rastrigin|quartic)>\n");
+        printf("Usage: mpirun -np <processors> ./sa_openmpi <size of function> <function(rastrigin|quartic|rosebrock)>\n");
         printf("Usage: specify function as rastrigin or quartic\n");
         MPI_Finalize();
         return 0;
@@ -94,7 +102,7 @@ int main(int argc, char** argv)
         .iterations_per_temperature_step = iterations
     };
 
-    int seed = time(NULL);
+    int seed = time(NULL) + world_rank;
 
     struct timeval st, et;
 
@@ -111,17 +119,21 @@ int main(int argc, char** argv)
                                    x_left_boundaries,
                                    x_right_boundaries,
                                    &seed);
-
+								   
     MPI_Barrier(MPI_COMM_WORLD);
 
     if(world_rank == 0)
-    {
+    {		
         gettimeofday(&et,NULL);
 
         int elapsed_openmpi = ((et.tv_sec - st.tv_sec) * 1000) + (et.tv_usec - st.tv_usec) / 1000;
 
         printf("## Simulated Annealing OpenMPI ## time for %s function of size: %d: %d milliseconds on rank: %d\n",argv[2],size_of_task, elapsed_openmpi, world_rank);
-        printf("## Simulated Annealing OpenMPI ## result: %f:\n", y);
+        printf("## Simulated Annealing OpenMPI ## result: %.17g:\n", y);
+		for(unsgined int i = 0; i < size_of_task; ++i)
+		{
+			printf("x[%d]: %.17g",i, x_opt[i]);
+		}
 
         if(strcmp("rastrigin",argv[2]) == 0)
         {
@@ -138,6 +150,14 @@ int main(int argc, char** argv)
             quartic_function_initialize(x_opt,size_of_task);
             set_range_to(x_left_boundaries, size_of_task, -1.1);
             set_range_to(x_right_boundaries, size_of_task, 1.1);
+        }
+        else if(strcmp("rosenbrock",argv[2]) == 0)
+        {
+            function = generalized_rosenbrock_function;
+            generalized_rosenbrock_initialize(x_0,size_of_task);
+            generalized_rosenbrock_initialize(x_opt,size_of_task);
+            set_range_to(x_left_boundaries, size_of_task, (double)-3);
+            set_range_to(x_right_boundaries, size_of_task, (double)3);
         }
         else
         {
@@ -164,13 +184,18 @@ int main(int argc, char** argv)
 
         int elapsed_sequential = ((et.tv_sec - st.tv_sec) * 1000) + (et.tv_usec - st.tv_usec) / 1000;
 
-        printf("## Simulated annealing sequential time for %s function of size: %d: %d milliseconds\n",argv[2], size_of_task, elapsed_sequential);
+        printf("## \nSimulated annealing sequential time for %s function of size: %d: %d milliseconds\n",argv[2], size_of_task, elapsed_sequential);
 
-        printf("## Simulated annealing sequential result: %f:\n", y_seq);
+        printf("## Simulated annealing sequential result: %.17g:\n", y_seq);
 
         double speedup = (double)elapsed_sequential/(double)elapsed_openmpi;
 
         printf("## Simulated annealing speedup for %s function of size %u using OpenMPI: %f:\n",argv[2], size_of_task, speedup);
+		
+		for(unsgined int i = 0; i < size_of_task; ++i)
+		{
+			printf("x[%d]: %.17g ",i, x_opt[i]);
+		}
     }
 
     MPI_Finalize(); // finish MPI environment
