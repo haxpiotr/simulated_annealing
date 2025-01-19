@@ -2,3 +2,5 @@ sa_openmp
 sa_sequential
 sa_openmpi
 *.o
+*.exe
+*.obj
