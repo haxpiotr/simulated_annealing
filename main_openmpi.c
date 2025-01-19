@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 
         printf("## Simulated Annealing OpenMPI ## time for %s function of size: %d: %d milliseconds on rank: %d\n",argv[2],size_of_task, elapsed_openmpi, world_rank);
         printf("## Simulated Annealing OpenMPI ## result: %.17g:\n", y);
-		for(unsgined int i = 0; i < size_of_task; ++i)
+		for(unsigned int i = 0; i < size_of_task; ++i)
 		{
 			printf("x[%d]: %.17g",i, x_opt[i]);
 		}
@@ -192,7 +192,7 @@ int main(int argc, char** argv)
 
         printf("## Simulated annealing speedup for %s function of size %u using OpenMPI: %f:\n",argv[2], size_of_task, speedup);
 		
-		for(unsgined int i = 0; i < size_of_task; ++i)
+		for(unsigned int i = 0; i < size_of_task; ++i)
 		{
 			printf("x[%d]: %.17g ",i, x_opt[i]);
 		}
