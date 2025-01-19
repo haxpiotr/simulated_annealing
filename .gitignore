@@ -4,3 +4,5 @@ sa_openmpi
 *.o
 *.exe
 *.obj
+sa_pthread
+
