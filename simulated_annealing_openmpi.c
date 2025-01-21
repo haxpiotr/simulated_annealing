@@ -36,6 +36,8 @@ double simulated_annealing_openmpi(struct configuration* config,
     printf("## Simulated Annealing OpenMPI from processor %s, rank %d out of %d processors, initial result: %.17g ##\n",
             processor_name, world_rank, world_size, current_result);
 
+    MPI_Barrier(MPI_COMM_WORLD);
+
     while(T > eps)
     {
         for(unsigned int k = 0; k < L ; ++k)
@@ -61,6 +63,8 @@ double simulated_annealing_openmpi(struct configuration* config,
                 }
             }
         }
+
+        MPI_Barrier(MPI_COMM_WORLD);
 
         for(unsigned int rank = 0 ; rank < world_size; ++rank)
         {

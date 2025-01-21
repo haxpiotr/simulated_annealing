@@ -145,7 +145,7 @@ double quartic_function(double* x, unsigned int n)
     double result = 0;
     for(unsigned int i = 0; i < n; ++i)
     {
-        result += i * pow(x[i],2);
+        result += (i+1) * pow(x[i],2);
     }
     return pow(result,2);
 }

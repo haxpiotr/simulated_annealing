@@ -98,7 +98,7 @@ int main(int argc, char** argv)
     {
         .initial_temperature = 1000,
         .alpha_coefficient = 0.01,
-        .minimal_temperature = 0.00001,
+        .minimal_temperature = 0.000001,
         .iterations_per_temperature_step = iterations
     };
 
@@ -128,7 +128,7 @@ int main(int argc, char** argv)
 
         int elapsed_openmpi = ((et.tv_sec - st.tv_sec) * 1000) + (et.tv_usec - st.tv_usec) / 1000;
 
-        printf("## Simulated Annealing OpenMPI ## time for %s function of size: %d: %d milliseconds on rank: %d\n",argv[2],size_of_task, elapsed_openmpi, world_rank);
+        printf("## Simulated Annealing OpenMPI ## time for %s function of size: %d: %d milliseconds on rank: %d of %d available\n",argv[2],size_of_task, elapsed_openmpi, world_rank, world_size);
         printf("## Simulated Annealing OpenMPI ## result: %.17g:\n", y);
 		for(unsigned int i = 0; i < size_of_task; ++i)
 		{
